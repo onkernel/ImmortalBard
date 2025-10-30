@@ -1,0 +1,34 @@
+{
+  "name": "immortal-bard",
+  "version": "0.1.0",
+  "description": "Natural language browser automation SDK powered by AI and Kernel - where code meets the stage",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node -r dotenv/config dist/examples/basic-usage.js"
+  },
+  "keywords": [
+    "playwright",
+    "browser-automation",
+    "ai",
+    "natural-language",
+    "kernel",
+    "llm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-sdk/anthropic": "^0.0.50",
+    "@ai-sdk/google": "^0.0.50",
+    "@ai-sdk/openai": "^0.0.50",
+    "@onkernel/sdk": "^0.17.0",
+    "ai": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.0.0",
+    "typescript": "^5.0.0"
+  }
+}
