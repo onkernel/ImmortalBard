@@ -45,18 +45,29 @@ PERFORMANCE:
 - This provides lower latency and higher throughput
 - Ideal for data extraction, form automation, and quick operations
 
-DOM AWARENESS:
-When the user provides a <current_page_dom> block, use the actual selectors from that DOM structure instead of guessing.
-Prioritize selectors in this order:
-1. data-testid attributes from the DOM
-2. id attributes from the DOM
-3. name attributes from the DOM
-4. Unique class combinations from the DOM
-5. text content matching
-6. CSS selectors based on DOM structure
+AI SNAPSHOT AWARENESS:
+When the user provides a <current_page_ai_snapshot> block, you will receive an ARIA (accessibility) snapshot in YAML format.
+This snapshot is generated using Playwright's _snapshotForAI() method and provides:
+- Accessibility tree structure with roles, labels, and hierarchy
+- More compact and AI-friendly format than raw HTML
+- Element references that can be used to build robust selectors
+
+Use this ARIA snapshot to:
+1. Understand page structure and element relationships
+2. Build role-based selectors (e.g., page.getByRole('button', { name: 'Submit' }))
+3. Use accessibility attributes (aria-label, role) for more resilient selectors
+4. Find elements by their accessible names and descriptions
+
+Prioritize selectors in this order when ARIA snapshot is available:
+1. Role-based selectors with accessible names (page.getByRole())
+2. data-testid attributes if present in snapshot
+3. Label-based selectors (page.getByLabel())
+4. Placeholder text selectors (page.getByPlaceholder())
+5. Accessible descriptions and ARIA attributes
+6. CSS selectors as fallback
 7. XPath only as last resort
 
-Analyze the DOM structure to find the most reliable selector for the element you need to interact with.
+The ARIA snapshot helps you generate more robust, accessibility-friendly automation code.
 
 Example patterns:
 // Navigation

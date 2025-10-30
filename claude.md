@@ -25,13 +25,14 @@ ImmortalBard/
 │   ├── types.ts              # TypeScript interfaces
 │   ├── kernel-client.ts      # Kernel SDK integration
 │   ├── code-generator.ts     # AI code generation logic
+│   ├── ai-snapshot.ts        # AI snapshot capture using _snapshotForAI()
 │   └── config.ts             # Default models & system prompt
 ├── examples/
 │   └── basic-usage.ts        # Usage examples
 ├── package.json
 ├── tsconfig.json
 ├── README.md
-└── claude.md                 # This file
+└── CLAUDE.md                 # This file
 ```
 
 ### Key Components
@@ -99,9 +100,15 @@ Core TypeScript interfaces:
 ```typescript
 export type AIProvider = 'openai' | 'anthropic' | 'google';
 
+export interface AISnapshotOptions {
+  enabled?: boolean;    // Enable AI snapshot capture (default: true)
+  maxTokens?: number;   // Max tokens for snapshot context (default: 4000)
+}
+
 export interface ImmortalBardConfig {
   provider: AIProvider;
   model?: string;       // Optional custom model override
+  aiSnapshot?: AISnapshotOptions;  // AI snapshot configuration
 }
 
 export interface BeseechResult {
@@ -147,13 +154,56 @@ export const DEFAULT_MODELS: Record<AIProvider, string> = {
 Defines instructions for the AI to generate valid Playwright code:
 - Generate only valid Playwright TypeScript code
 - Use async/await patterns
-- Prefer data-testid, then CSS selectors
+- Prefer role-based and accessibility selectors when AI snapshot is available
 - Include error handling with try-catch
 - Add comments for complex operations
 - Use page.waitForSelector() for dynamic content
 - Output only executable code (no markdown)
 - Assume 'page' variable is available
 - Handle timing issues properly
+- Use ARIA snapshot context to build robust, accessibility-friendly selectors
+
+#### 6. AI Snapshot (`src/ai-snapshot.ts`)
+
+Handles automatic page context capture using Playwright's internal `_snapshotForAI()` method.
+
+**What is AI Snapshot:**
+- Uses Playwright's experimental `page._snapshotForAI()` method
+- Captures accessibility tree (ARIA snapshot) in YAML format
+- More compact and AI-friendly than full DOM extraction
+- Filters out visual noise, focusing on functional elements
+- Provides element hierarchy with roles, labels, and attributes
+
+**Key Functions:**
+- `generateAISnapshotCode()` - Generates Playwright code to capture AI snapshot
+- `formatAISnapshotContext(context, maxTokens)` - Formats snapshot for AI prompt
+- `AISnapshotConfig` - Configuration interface (enabled, maxTokens)
+- `AISnapshotContext` - Result interface (url, title, snapshot YAML)
+
+**Implementation Details:**
+- Automatically called before each `beseech()` if enabled (default: true)
+- Snapshot is passed to AI in `<current_page_ai_snapshot>` XML tags
+- Token limiting prevents exceeding context windows
+- Failures don't block code generation (degrades gracefully)
+
+**Benefits:**
+- Smaller payload than DOM extraction (YAML vs JSON)
+- Encourages role-based selectors (more resilient)
+- Better accessibility (uses ARIA tree)
+- Less custom code to maintain (leverages Playwright internals)
+
+**Configuration Example:**
+```typescript
+await bard.scene({
+  provider: 'anthropic',
+  aiSnapshot: {
+    enabled: true,      // Enable snapshot capture
+    maxTokens: 4000,    // Limit snapshot size
+  },
+});
+```
+
+**Note:** `_snapshotForAI()` is an internal, experimental Playwright API and may change in future versions.
 
 ## Development Setup
 
@@ -309,6 +359,16 @@ Currently uses manual integration testing against:
 
 ## Version History
 
+- **v0.2.0**: AI Snapshot Integration (Current)
+  - Replaced DOM extraction with Playwright's `_snapshotForAI()`
+  - ARIA/accessibility tree snapshots in YAML format
+  - Renamed `DOMCaptureOptions` → `AISnapshotOptions`
+  - Renamed `domCapture` config → `aiSnapshot`
+  - Removed `maxDepth` option (not applicable to AI snapshots)
+  - Updated system prompt for role-based selector generation
+  - Enhanced AI to use accessibility-focused selectors
+  - More compact snapshot payload (better token efficiency)
+
 - **v0.1.0**: Initial SDK release
   - Core ImmortalBard class with lifecycle methods
   - Multi-provider AI support (OpenAI, Anthropic, Google)
@@ -357,27 +417,37 @@ Currently uses manual integration testing against:
    - ImmortalBard class orchestrates everything
    - CodeGenerator handles AI interaction
    - KernelClient handles browser interaction
+   - AISnapshot module captures page context using `_snapshotForAI()`
    - Config file contains constants (models, prompts)
    - Types file defines all interfaces
 
 3. **State Management**:
    - `currentSessionId` tracks active browser session
    - `isSceneSet` ensures provider is configured
+   - `aiSnapshotConfig` controls snapshot capture behavior
    - Conversation history maintained in CodeGenerator
    - Process exit handler for cleanup
 
-4. **Breaking Changes**: This is v0.1.0, so API changes are acceptable. Document them clearly in version history.
+4. **AI Snapshot Feature**:
+   - Uses Playwright's internal `_snapshotForAI()` method (experimental)
+   - Captures ARIA/accessibility tree in YAML format
+   - Automatically passed to AI before each `beseech()` call
+   - Enables role-based, accessibility-focused selector generation
+   - More compact than DOM extraction (better token efficiency)
+   - Gracefully degrades if snapshot capture fails
 
-5. **Dependencies**:
+5. **Breaking Changes**: This is v0.2.0. Config property `domCapture` renamed to `aiSnapshot`. Document all changes in version history.
+
+6. **Dependencies**:
    - Uses Vercel AI SDK (`ai`, `@ai-sdk/*`) for LLM providers
    - Uses Kernel SDK (`@onkernel/sdk`) for remote browsers
    - No local Playwright dependency (all execution is remote)
 
-6. **Type Safety**: Maintain full TypeScript type coverage for good DX.
+7. **Type Safety**: Maintain full TypeScript type coverage for good DX.
 
-7. **API Key Management**:
+8. **API Key Management**:
    - Constructor params take precedence
    - Falls back to environment variables
    - Kernel SDK automatically uses `KERNEL_API_KEY` env var
 
-8. **Error Philosophy**: Never throw from `beseech()` - always return structured result with error field.
+9. **Error Philosophy**: Never throw from `beseech()` - always return structured result with error field.

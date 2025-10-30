@@ -8,63 +8,63 @@ Command browsers as the Bard commanded language itself. No more wrestling with s
 
 Powered by [AI SDK](https://ai-sdk.dev/), [Kernel's](https://www.onkernel.com/docs/introduction) cloud browser infra with [Playwright Execution API](https://www.onkernel.com/docs/browsers/playwright-execution), and the timeless spirit of Shakespeare.
 
-## What Is This?
-
-ImmortalBard vanquishes browser automation complexity. Speak your desires in plain English, and ImmortalBard crafts and performs masterful Playwright code in real browsers running in Kernel's cloud infrastructure.
-
 ## Features Most Excellent
 
 - **🎭 Natural Language Commands**: No code theatrics. Speak thy intent, the Bard performs.
-- **📜 Multi-Provider AI**: Choose your muse—OpenAI, Anthropic, or Google AI models
+- **📜 Multi-Provider AI SDK**: Choose your muse—OpenAI, Anthropic, or Google AI models
 - **⚡ Zero-Latency Execution**: Code runs directly in browser VMs via Kernel's Playwright API
-- **🎯 DOM-Aware Generation**: Captures live page structure before every command—no more guessing selectors
+- **🎯 AI Snapshot Intelligence**: Captures ARIA accessibility tree before every command—role-based, resilient selectors
 - **🧠 Contextual Intelligence**: Maintains conversation history across commands for smarter automation
 - **🔒 TypeScript Native**: Full type safety, because drama belongs on the stage, not in your codebase
 
 ## Local Development Setup
 
-This SDK is currently in development and not yet published to npm. To use it locally:
+This SDK is a demo and requires local development.
 
-### 1. Clone and Build
+### Quick Start
 
 ```bash
-# Clone the repository
 git clone <repository-url>
 cd ImmortalBard
-
-# Install dependencies
 npm install
-
-# Build the TypeScript source
-npm run build
+npm run dev          # Terminal 1: Watch and rebuild on changes
+npm start            # Terminal 2: Run basic-usage.ts example
 ```
 
-### 2. Link Locally (Optional)
-
-To use ImmortalBard in another local project:
+### Running Examples
 
 ```bash
-# In the ImmortalBard directory
-npm link
-
-# In your project directory
-npm link immortal-bard
-```
-
-Or simply import directly from the built files:
-
-```typescript
-// In your project (assuming ImmortalBard is in a sibling directory)
-import { ImmortalBard } from '../ImmortalBard/dist/index.js';
-```
-
-### 3. Run the Example
-
-```bash
-# Create a .env file with your API keys (see below)
-# Then run the included example
+# Run the default example (uses compiled code)
 npm start
+
+# Run any example directly (no build needed)
+npx tsx examples/basic-usage.ts
+npx tsx examples/your-custom-example.ts
 ```
+
+### Example Output
+
+```
+> npm start
+
+Setting the scene...
+Entering the stage...
+
+Navigating to fandom.com...
+Generated code: await page.goto('https://fandom.com');
+Returned data: undefined
+
+Searching for Gojo...
+Generated code: await page.getByRole('textbox', { name: 'Search' }).fill('Gojo');
+Returned data: undefined
+
+Extracting first result...
+Generated code: await page.waitForSelector('article h3');
+return title?.trim();
+Returned data: The Strongest
+```
+
+Note: `getByRole()` selectors come from AI Snapshot - the AI analyzes the page's accessibility tree for resilient selectors.
 
 ## Setup: Prepare the Stage
 
@@ -72,7 +72,7 @@ npm start
 
 You'll need:
 
-1. **Kernel API Key** - Your entrance to the cloud theatre → [kernel.com](https://kernel.com)
+1. **Kernel API Key** - Your entrance to the cloud theatre → [kernel Dashboard](https://dashboard.onkernel.com/api-keys)
 2. **AI Provider Key** - Choose your dramatic voice:
    - [OpenAI](https://platform.openai.com/)
    - [Anthropic](https://console.anthropic.com/)
@@ -91,12 +91,6 @@ ANTHROPIC_API_KEY=your_anthropic_key
 GOOGLE_API_KEY=your_google_key
 ```
 
-Or inject them directly into the constructor (no `.env` required):
-
-```typescript
-const bard = new ImmortalBard(openaiApiKey, anthropicApiKey, googleApiKey);
-```
-
 ## Usage: The Performance Begins
 
 ### The 4-Act Play
@@ -109,7 +103,7 @@ const bard = new ImmortalBard();
 // 1. SET THE SCENE - Choose your AI muse
 await bard.scene({ provider: 'openai' });
 
-// 2. TO BE - Launch a cloud browser (or not to be?)
+// 2. TO BE - Launch a cloud browser
 await bard.toBe();
 
 // 3. BESEECH - Command in natural language
@@ -153,7 +147,11 @@ Initialize the Immortal Bard. Pass API keys directly or rely on environment vari
 ```typescript
 interface ImmortalBardConfig {
   provider: 'openai' | 'anthropic' | 'google';
-  model?: string; // Optional: custom model name
+  model?: string; // Optional: custom model name for AI SDK
+  aiSnapshot?: {  // Optional: configure AI snapshot capture settings
+    enabled?: boolean;    // default: true
+    maxTokens?: number;   // default: 4000
+  };
 }
 ```
 
@@ -168,7 +166,7 @@ interface ImmortalBardConfig {
 
 ### `await bard.beseech(instruction: string): Promise<BeseechResult>`
 
-**Beseech the Bard** - Speak thy intent in natural language. The Bard transforms it into Playwright code, captures the current page DOM for context, executes in the remote browser, and returns all.
+**Beseech the Bard** - Speak thy intent in natural language. The Bard transforms it into Playwright code, captures the current page AI snapshot for context, executes in the remote browser, and returns all.
 
 **Returns:**
 ```typescript
@@ -223,9 +221,9 @@ if (result.error) {
 1. **🎭 scene()** - Choose your AI muse (OpenAI, Anthropic, or Google)
 2. **📖 toBe()** - Launch a browser session in Kernel's cloud
 3. **🎪 beseech()** - The performance:
-   - Captures the live page DOM (no blind selector guessing)
-   - Feeds your instruction + DOM to the AI
-   - AI crafts eloquent Playwright code using *actual* selectors
+   - Captures the live page AI snapshot (ARIA accessibility tree in YAML)
+   - Feeds your instruction + snapshot to the AI
+   - AI crafts eloquent Playwright code using role-based, accessible selectors
    - Executes in Kernel's remote browser
    - Returns code, data, and errors
 4. **🌙 notToBe()** - Close the session and clean up
@@ -259,44 +257,29 @@ Your AI-generated code has access to the complete Playwright stage:
 - **`context`** - Browser context (cookies, localStorage, sessionStorage)
 - **`browser`** - Browser instance (multi-page ops, new contexts)
 
-### Extracting Data with Grace
 
-Use `return` statements in your natural language commands to pull data back:
+### AI Snapshot Intelligence: Accessibility-First and True
 
-```typescript
-// Simply beseech for data—the Bard extracts and returns it
-const result = await bard.beseech('Get all links on the page');
+**The secret art:** Before every `beseech()`, ImmortalBard captures an AI-optimized snapshot of the page using Playwright's `_snapshotForAI()` method and feeds it to the AI.
 
-// AI generates something like:
-// const links = await page.$$eval('a', els =>
-//   els.map(a => ({ text: a.textContent, href: a.href }))
-// );
-// return links;
+**What makes this magical:**
+- 🎯 **ARIA/Accessibility Tree** - Captures the semantic structure, not raw HTML
+- 🎭 **Role-Based Selectors** - Uses roles, labels, and accessible names (more resilient than CSS)
+- 📦 **Compact YAML Format** - Smaller payload, better token efficiency
 
-console.log(result.result); // Array of {text, href} objects
-```
-
-### DOM-Aware Code Generation: Prescient and True
-
-**The secret art:** Before every `beseech()`, ImmortalBard captures the live page DOM and feeds it to the AI.
-
-**Why this enchants:**
-- ✅ Uses *actual* selectors from the page (not mere guesses)
-- ✅ Finds elements by their true IDs, classes, and attributes
-- ✅ Generates code that stands the test of time
-
-**Configure DOM capture** (optional):
+**Configure AI snapshot** (optional):
 
 ```typescript
 await bard.scene({
   provider: 'openai',
-  domCapture: {
+  aiSnapshot: {
     enabled: true,      // default: true (highly recommended)
-    maxDepth: 5,        // default: 5 (how deep to traverse the DOM tree)
-    maxTokens: 4000     // default: 4000 (trim large DOMs to conserve tokens)
+    maxTokens: 4000     // default: 4000 (trim large snapshots to conserve tokens)
   }
 });
 ```
+
+**Note:** Uses Playwright's experimental `_snapshotForAI()` internal API for optimal AI comprehension.
 
 ## Requirements: The Theatre's Foundations
 
@@ -305,4 +288,4 @@ await bard.scene({
 
 ## License
 
-MIT 🎭
+MIT ❤️

@@ -1,21 +1,20 @@
 import { KernelClient } from './kernel-client';
 import { CodeGenerator } from './code-generator';
-import { ImmortalBardConfig, BeseechResult, DOMCaptureOptions } from './types';
-import { generateDOMExtractionCode, formatDOMContext, DOMContext } from './dom-extractor';
+import { ImmortalBardConfig, BeseechResult, AISnapshotOptions } from './types';
+import { generateAISnapshotCode, formatAISnapshotContext, AISnapshotContext } from './ai-snapshot';
 
 export class ImmortalBard {
   private kernelClient: KernelClient;
   private codeGenerator: CodeGenerator;
   private currentSessionId: string | null = null;
   private isSceneSet: boolean = false;
-  private domCaptureConfig: DOMCaptureOptions;
+  private aiSnapshotConfig: AISnapshotOptions;
 
   constructor(openaiApiKey?: string, anthropicApiKey?: string, googleApiKey?: string) {
     this.kernelClient = new KernelClient();
     this.codeGenerator = new CodeGenerator(openaiApiKey, anthropicApiKey, googleApiKey);
-    this.domCaptureConfig = {
+    this.aiSnapshotConfig = {
       enabled: true,
-      maxDepth: 5,
       maxTokens: 4000,
     };
   }
@@ -24,11 +23,11 @@ export class ImmortalBard {
     try {
       this.codeGenerator.setProvider(config.provider, config.model);
 
-      // Configure DOM capture options
-      if (config.domCapture) {
-        this.domCaptureConfig = {
-          ...this.domCaptureConfig,
-          ...config.domCapture,
+      // Configure AI snapshot options
+      if (config.aiSnapshot) {
+        this.aiSnapshotConfig = {
+          ...this.aiSnapshotConfig,
+          ...config.aiSnapshot,
         };
       }
 
@@ -71,19 +70,19 @@ export class ImmortalBard {
     }
 
     try {
-      // Capture DOM structure if enabled
-      let domContext: string | undefined;
-      if (this.domCaptureConfig.enabled) {
+      // Capture AI snapshot if enabled
+      let aiSnapshotContext: string | undefined;
+      if (this.aiSnapshotConfig.enabled) {
         try {
-          domContext = await this.captureDOMStructure();
-        } catch (domError) {
-          // Don't fail the entire beseech if DOM capture fails
-          console.warn('DOM capture failed:', domError);
+          aiSnapshotContext = await this.captureAISnapshot();
+        } catch (snapshotError) {
+          // Don't fail the entire beseech if AI snapshot capture fails
+          console.warn('AI snapshot capture failed:', snapshotError);
         }
       }
 
-      // Generate code with optional DOM context
-      const generatedCode = await this.codeGenerator.generatePlaywrightCode(instruction, domContext);
+      // Generate code with optional AI snapshot context
+      const generatedCode = await this.codeGenerator.generatePlaywrightCode(instruction, aiSnapshotContext);
 
       try {
         const executionResult = await this.kernelClient.execute(this.currentSessionId, generatedCode);
@@ -109,27 +108,24 @@ export class ImmortalBard {
     }
   }
 
-  private async captureDOMStructure(): Promise<string> {
+  private async captureAISnapshot(): Promise<string> {
     if (!this.currentSessionId) {
       throw new Error('No active session');
     }
 
-    // Generate Playwright code to extract DOM
-    const domExtractionCode = generateDOMExtractionCode({
-      maxDepth: this.domCaptureConfig.maxDepth,
-      maxTokens: this.domCaptureConfig.maxTokens,
-    });
+    // Generate Playwright code to capture AI snapshot
+    const aiSnapshotCode = generateAISnapshotCode();
 
-    // Execute the DOM extraction code via Kernel SDK
-    const result = await this.kernelClient.execute(this.currentSessionId, domExtractionCode);
+    // Execute the AI snapshot code via Kernel SDK
+    const result = await this.kernelClient.execute(this.currentSessionId, aiSnapshotCode);
 
     if (!result.success || !result.result) {
-      throw new Error(`DOM extraction failed: ${result.error || 'Unknown error'}`);
+      throw new Error(`AI snapshot capture failed: ${result.error || 'Unknown error'}`);
     }
 
-    // Format DOM context for AI consumption
-    const domContext = result.result as DOMContext;
-    return formatDOMContext(domContext, this.domCaptureConfig.maxTokens);
+    // Format AI snapshot context for AI consumption
+    const snapshotContext = result.result as AISnapshotContext;
+    return formatAISnapshotContext(snapshotContext, this.aiSnapshotConfig.maxTokens);
   }
 
   async notToBe(): Promise<void> {

@@ -1,15 +1,14 @@
 export type AIProvider = 'openai' | 'anthropic' | 'google';
 
-export interface DOMCaptureOptions {
+export interface AISnapshotOptions {
   enabled?: boolean;
-  maxDepth?: number;
   maxTokens?: number;
 }
 
 export interface ImmortalBardConfig {
   provider: AIProvider;
   model?: string;
-  domCapture?: DOMCaptureOptions;
+  aiSnapshot?: AISnapshotOptions;
 }
 
 export interface KernelSession {

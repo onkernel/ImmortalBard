@@ -55,15 +55,15 @@ export class CodeGenerator {
     ];
   }
 
-  async generatePlaywrightCode(instruction: string, domContext?: string): Promise<string> {
+  async generatePlaywrightCode(instruction: string, aiSnapshotContext?: string): Promise<string> {
     if (!this.provider || !this.model) {
       throw new Error('Provider not set. Call setProvider() first.');
     }
 
-    // Build user message with optional DOM context
+    // Build user message with optional AI snapshot context
     let userMessage = instruction;
-    if (domContext) {
-      userMessage = `${instruction}\n\n<current_page_dom>\n${domContext}\n</current_page_dom>`;
+    if (aiSnapshotContext) {
+      userMessage = `${instruction}\n\n<current_page_ai_snapshot>\n${aiSnapshotContext}\n</current_page_ai_snapshot>`;
     }
 
     this.conversationHistory.push({
