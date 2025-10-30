@@ -4,9 +4,9 @@
 
 > *"All the world's a stage, and all the browsers merely players."*
 
-Command browsers as the Bard commanded language itself. No more wrestling with selectors or debugging brittle scripts. Set the scene, beseech your intent, and let ImmortalBard transform your natural language into eloquent Playwright code.
+Command browsers as the Bard commanded language itself. No more wrestling with selectors or debugging brittle scripts. Set the scene, beseech your intent, and let The Immortal Bard transform your natural language into eloquent Playwright code for execution.
 
-Powered by AI SDK, Kernel's remote browser infrastructure, and the timeless spirit of Shakespeare.
+Powered by [AI SDK](https://ai-sdk.dev/), [Kernel's](https://www.onkernel.com/docs/introduction) cloud browser infra with [Playwright Execution API](https://www.onkernel.com/docs/browsers/playwright-execution), and the timeless spirit of Shakespeare.
 
 ## What Is This?
 
