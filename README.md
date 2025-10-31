@@ -23,6 +23,8 @@ With Kernel's Playwright Execution API, your playwright code runs directly in th
 - **🔒 Isolated & Fresh** - Each execution gets a clean context for safety and reliability
 - **⏱️ Configurable Timeouts** - Up to 300 seconds for complex operations
 
+https://github.com/user-attachments/assets/2e74681b-fc01-4e9a-a940-7abb9993534a
+
 ### Making It Agentic
 
 ImmortalBard layers [Vercel's AI SDK](https://ai-sdk.dev/) on top of Kernel's execution infrastructure to create an agentic playwright automation experience:
