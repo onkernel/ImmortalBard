@@ -137,7 +137,8 @@ const bard = new ImmortalBard();
 await bard.scene({ provider: 'openai' });
 
 // 2. TO BE - Launch a cloud browser
-await bard.toBe();
+const liveViewUrl = await bard.toBe();
+console.log('Watch live:', liveViewUrl);
 
 // 3. BESEECH - Command in natural language
 const result = await bard.beseech('Navigate to https://example.com');
@@ -156,7 +157,7 @@ import { ImmortalBard } from 'immortal-bard';
 const bard = new ImmortalBard();
 
 await bard.scene({ provider: 'anthropic' });
-await bard.toBe();
+const liveViewUrl = await bard.toBe();
 
 // Each beseech() remembers the previous context
 await bard.beseech('Go to github.com');
@@ -193,9 +194,11 @@ interface ImmortalBardConfig {
 - Anthropic: `claude-sonnet-4-5`
 - Google: `gemini-2.5-pro`
 
-### `await bard.toBe()`
+### `await bard.toBe(): Promise<string>`
 
 **To be** - Launch a remote browser session in Kernel's cloud infrastructure. Enter the stage.
+
+**Returns:** The browser's live view URL where you can watch the automation in real-time.
 
 ### `await bard.beseech(instruction: string, options?: BeseechOptions): Promise<BeseechResult>`
 

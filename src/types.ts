@@ -15,6 +15,7 @@ export interface KernelSession {
   session_id: string;
   wsEndpoint?: string;
   status?: string;
+  browser_live_view_url?: string;
 }
 
 export interface KernelExecutionResult {

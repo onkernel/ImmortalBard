@@ -38,7 +38,7 @@ export class ImmortalBard {
     }
   }
 
-  async toBe(): Promise<void> {
+  async toBe(): Promise<string> {
     if (!this.isSceneSet) {
       throw new Error('Scene not set. Call scene() before toBe().');
     }
@@ -56,6 +56,8 @@ export class ImmortalBard {
           this.notToBe().catch(console.error);
         }
       });
+
+      return session.browser_live_view_url || '';
     } catch (error) {
       throw new Error(`Failed to enter the stage: ${error instanceof Error ? error.message : String(error)}`);
     }

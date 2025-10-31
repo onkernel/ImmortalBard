@@ -11,14 +11,19 @@ async function main() {
 
     // Enter the stage - launch a browser session
     console.log('Entering the stage...');
-    await bard.toBe();
+    const liveViewUrl = await bard.toBe();
+    console.log('Browser live view:', liveViewUrl);
 
-    // Beseech the bard with natural language commands
+    // Generate Playwright code from natural language commands
+
+    // Beseech(): Navigate to fandom.com
     console.log('\nNavigating to fandom.com...');
     let result = await bard.beseech('Navigate to https://fandom.com');
     console.log('Generated code:', result.code);
     console.log('Returned data:', result.result);
     if (result.error) console.error('Error:', result.error);
+
+    // Beseech(): Search for Gojo
     console.log('\nSearching for Gojo...');
     result = await bard.beseech(
       'Type "Gojo" in the search box and press enter', 
@@ -30,11 +35,18 @@ async function main() {
     console.log('Returned data:', result.result);
     if (result.error) console.error('Error:', result.error);
 
+    // Beseech(): Extract the title of the first search result
     console.log('\nExtracting first result...');
     result = await bard.beseech('Tell me the title of the first search result');
     console.log('Generated code:', result.code);
-    console.log('Returned data:', result.result);
+    console.log('Returned data:', result.result.trim());
     if (result.error) console.error('Error:', result.error);
+
+    // Close the browser session
+    console.log('\nClosing the browser session...');
+    await bard.notToBe();
+    console.log('Browser session alive:', bard.isPerforming());
+
   } catch (error) {
     console.error('Error:', error);
   }
