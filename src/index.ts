@@ -4,6 +4,7 @@ export type {
   ImmortalBardConfig,
   AISnapshotOptions,
   BeseechResult,
+  BeseechOptions,
   KernelSession,
   KernelExecutionResult,
   ChatMessage,

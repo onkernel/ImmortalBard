@@ -7,7 +7,7 @@ async function main() {
   try {
     // Set the scene - configure the AI provider
     console.log('Setting the scene...');
-    await bard.scene({ provider: 'openai' });
+    await bard.scene({ provider: 'anthropic' });
 
     // Enter the stage - launch a browser session
     console.log('Entering the stage...');
@@ -19,9 +19,13 @@ async function main() {
     console.log('Generated code:', result.code);
     console.log('Returned data:', result.result);
     if (result.error) console.error('Error:', result.error);
-
     console.log('\nSearching for Gojo...');
-    result = await bard.beseech('Type "Gojo" in the search box and press enter');
+    result = await bard.beseech(
+      'Type "Gojo" in the search box and press enter', 
+      {
+        timeout: 120
+      }
+    );
     console.log('Generated code:', result.code);
     console.log('Returned data:', result.result);
     if (result.error) console.error('Error:', result.error);

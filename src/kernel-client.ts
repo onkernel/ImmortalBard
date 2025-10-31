@@ -17,9 +17,13 @@ export class KernelClient {
     }
   }
 
-  async execute(sessionId: string, code: string): Promise<KernelExecutionResult> {
+  async execute(sessionId: string, code: string, timeoutSec?: number): Promise<KernelExecutionResult> {
     try {
-      const response = await this.kernel.browsers.playwright.execute(sessionId, { code });
+      const params: any = { code };
+      if (timeoutSec !== undefined) {
+        params.timeout_sec = timeoutSec;
+      }
+      const response = await this.kernel.browsers.playwright.execute(sessionId, params);
       return response;
     } catch (error) {
       throw new Error(`Kernel SDK error: ${error instanceof Error ? error.message : String(error)}`);

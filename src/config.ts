@@ -6,6 +6,31 @@ export const DEFAULT_MODELS: Record<AIProvider, string> = {
   google: 'gemini-2.5-pro',
 };
 
+// Timeout configuration constants
+export const MIN_TIMEOUT_SEC = 1;
+export const MAX_TIMEOUT_SEC = 300;
+
+/**
+ * Validates and clamps timeout value within allowed range
+ * @param timeout - Timeout in seconds (optional)
+ * @returns Clamped timeout value or undefined if not provided
+ */
+export function validateTimeout(timeout?: number): number | undefined {
+  if (timeout === undefined) {
+    return undefined;
+  }
+
+  if (timeout < MIN_TIMEOUT_SEC) {
+    return MIN_TIMEOUT_SEC;
+  }
+
+  if (timeout > MAX_TIMEOUT_SEC) {
+    return MAX_TIMEOUT_SEC;
+  }
+
+  return timeout;
+}
+
 export const SYSTEM_PROMPT = `You are an expert Playwright code generator.
 Follow these rules strictly:
 1. Generate only valid Playwright TypeScript code
@@ -44,6 +69,16 @@ PERFORMANCE:
 - Your code runs directly in the browser's VM (no CDP overhead)
 - This provides lower latency and higher throughput
 - Ideal for data extraction, form automation, and quick operations
+
+TIMEOUT CONSIDERATIONS:
+- Each code execution has a configurable timeout (minimum: 1 second, default: 60 seconds, maximum: 300 seconds)
+- The user may specify a custom timeout for their operation - you will be informed if a non-default timeout is configured
+- When a longer timeout is provided, you can write more comprehensive code for complex operations:
+  * 60-90s: Standard operations (navigation, clicks, simple data extraction)
+  * 90-150s: Medium complexity (multi-step forms, moderate data scraping, waiting for slow content)
+  * 150-300s: Complex operations (large-scale data extraction, multiple page navigations, extensive scraping)
+- Always write efficient code, but don't artificially limit complexity when longer timeouts are available
+- If an operation might naturally take longer than the configured timeout, consider breaking it into logical steps
 
 AI SNAPSHOT AWARENESS:
 When the user provides a <current_page_ai_snapshot> block, you will receive an ARIA (accessibility) snapshot in YAML format.

@@ -195,9 +195,23 @@ interface ImmortalBardConfig {
 
 **To be** - Launch a remote browser session in Kernel's cloud infrastructure. Enter the stage.
 
-### `await bard.beseech(instruction: string): Promise<BeseechResult>`
+### `await bard.beseech(instruction: string, options?: BeseechOptions): Promise<BeseechResult>`
 
 **Beseech the Bard** - Speak thy intent in natural language. The Bard transforms it into Playwright code, captures the current page AI snapshot for context, executes in the remote browser, and returns all.
+
+**Parameters:**
+```typescript
+interface BeseechOptions {
+  timeout?: number;  // Timeout in seconds (min: 1, max: 300, default: 60)
+}
+```
+
+**Timeout behavior:**
+- **Default**: 60 seconds (if not specified)
+- **Minimum**: 1 second (values below 1 are clamped to 1)
+- **Maximum**: 300 seconds (values above 300 are clamped to 300)
+- The timeout is passed to both the AI (for code optimization) and Kernel SDK (for execution)
+- Use longer timeouts for complex operations like large-scale data extraction or multi-page scraping
 
 **Returns:**
 ```typescript
@@ -245,6 +259,25 @@ if (result.error) {
 } else {
   console.log('Hark! Success! Returned data:', result.result);
 }
+```
+
+### Configure Timeout for Complex Operations
+
+```typescript
+// Simple operation - use default 60 second timeout
+await bard.beseech('Navigate to https://example.com');
+
+// Medium complexity - specify 120 second timeout
+await bard.beseech('Fill out the registration form and submit', { timeout: 120 });
+
+// Complex scraping operation - use maximum 300 second timeout
+const products = await bard.beseech(
+  'Extract all product names, prices, and ratings from the first 10 pages',
+  { timeout: 300 }
+);
+
+// The AI receives the timeout and optimizes code accordingly
+console.log('Extracted products:', products.result);
 ```
 
 ## How the Performance Unfolds

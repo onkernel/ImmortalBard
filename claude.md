@@ -50,7 +50,7 @@ The main SDK interface with the following lifecycle:
 **Key Methods:**
 - `scene(config: ImmortalBardConfig)` - Sets up AI provider
 - `toBe()` - Launches browser session
-- `beseech(instruction: string)` - Executes natural language command
+- `beseech(instruction: string, options?: BeseechOptions)` - Executes natural language command with optional timeout
 - `notToBe()` - Closes session
 - `isPerforming()` - Checks if session is active
 
@@ -69,7 +69,7 @@ Handles AI interaction to convert natural language to Playwright code.
 
 **Key Methods:**
 - `setProvider(provider, customModel?)` - Configure AI provider
-- `generatePlaywrightCode(instruction)` - Generate code from natural language
+- `generatePlaywrightCode(instruction, aiSnapshotContext?, timeoutSec?)` - Generate code from natural language with optional timeout awareness
 - `resetContext()` - Clear conversation history
 - `cleanCode(text)` - Strip markdown formatting from generated code
 
@@ -84,7 +84,7 @@ Manages communication with Kernel SDK for remote browser automation.
 
 **Key Methods:**
 - `launchSession()` - Creates new browser session via `kernel.browsers.create()`
-- `execute(sessionId, code)` - Runs Playwright code via `kernel.browsers.playwright.execute()`
+- `execute(sessionId, code, timeoutSec?)` - Runs Playwright code via `kernel.browsers.playwright.execute()` with optional timeout
 - `closeSession(sessionId)` - Terminates browser session via `kernel.browsers.deleteByID()`
 
 **Implementation Details:**
@@ -115,6 +115,10 @@ export interface BeseechResult {
   code: string;         // Generated Playwright code
   result: any;          // Execution result from browser
   error: string | null; // Error message if failed
+}
+
+export interface BeseechOptions {
+  timeout?: number;     // Timeout in seconds (min: 1, max: 300, default: 60)
 }
 
 export interface KernelSession {
@@ -150,6 +154,19 @@ export const DEFAULT_MODELS: Record<AIProvider, string> = {
 };
 ```
 
+**Timeout Configuration:**
+```typescript
+export const MIN_TIMEOUT_SEC = 1;
+export const MAX_TIMEOUT_SEC = 300;
+
+export function validateTimeout(timeout?: number): number | undefined {
+  // Clamps timeout to min/max range
+  // Returns undefined if not provided
+  // Returns MIN_TIMEOUT_SEC if < 1
+  // Returns MAX_TIMEOUT_SEC if > 300
+}
+```
+
 **System Prompt:**
 Defines instructions for the AI to generate valid Playwright code:
 - Generate only valid Playwright TypeScript code
@@ -162,6 +179,7 @@ Defines instructions for the AI to generate valid Playwright code:
 - Assume 'page' variable is available
 - Handle timing issues properly
 - Use ARIA snapshot context to build robust, accessibility-friendly selectors
+- Consider timeout constraints when provided (60-90s: standard, 90-150s: medium, 150-300s: complex operations)
 
 #### 6. AI Snapshot (`src/ai-snapshot.ts`)
 
@@ -359,7 +377,16 @@ Currently uses manual integration testing against:
 
 ## Version History
 
-- **v0.2.0**: AI Snapshot Integration (Current)
+- **v0.3.0**: Configurable Timeout Support (Current)
+  - Added optional `timeout` parameter to `beseech()` method via `BeseechOptions` interface
+  - Timeout validation with automatic clamping (min: 1s, max: 300s, default: 60s)
+  - AI receives timeout value to optimize code generation based on available time
+  - Kernel SDK receives timeout via `timeout_sec` parameter
+  - Updated system prompt with timeout considerations and guidance
+  - Added `validateTimeout()` helper function in config.ts
+  - Backward compatible - all existing code continues to work
+
+- **v0.2.0**: AI Snapshot Integration
   - Replaced DOM extraction with Playwright's `_snapshotForAI()`
   - ARIA/accessibility tree snapshots in YAML format
   - Renamed `DOMCaptureOptions` → `AISnapshotOptions`

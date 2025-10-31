@@ -31,6 +31,10 @@ export interface BeseechResult {
   error: string | null;
 }
 
+export interface BeseechOptions {
+  timeout?: number; // Timeout in seconds (min: 1, max: 300, default: 60)
+}
+
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;

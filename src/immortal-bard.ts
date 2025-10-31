@@ -1,7 +1,8 @@
 import { KernelClient } from './kernel-client';
 import { CodeGenerator } from './code-generator';
-import { ImmortalBardConfig, BeseechResult, AISnapshotOptions } from './types';
+import { ImmortalBardConfig, BeseechResult, BeseechOptions, AISnapshotOptions } from './types';
 import { generateAISnapshotCode, formatAISnapshotContext, AISnapshotContext } from './ai-snapshot';
+import { validateTimeout } from './config';
 
 export class ImmortalBard {
   private kernelClient: KernelClient;
@@ -60,7 +61,7 @@ export class ImmortalBard {
     }
   }
 
-  async beseech(instruction: string): Promise<BeseechResult> {
+  async beseech(instruction: string, options?: BeseechOptions): Promise<BeseechResult> {
     if (!this.currentSessionId) {
       return {
         code: '',
@@ -68,6 +69,9 @@ export class ImmortalBard {
         error: 'No active session. Call toBe() first.',
       };
     }
+
+    // Validate and clamp timeout value
+    const validatedTimeout = validateTimeout(options?.timeout);
 
     try {
       // Capture AI snapshot if enabled
@@ -81,11 +85,19 @@ export class ImmortalBard {
         }
       }
 
-      // Generate code with optional AI snapshot context
-      const generatedCode = await this.codeGenerator.generatePlaywrightCode(instruction, aiSnapshotContext);
+      // Generate code with optional AI snapshot context and timeout
+      const generatedCode = await this.codeGenerator.generatePlaywrightCode(
+        instruction,
+        aiSnapshotContext,
+        validatedTimeout
+      );
 
       try {
-        const executionResult = await this.kernelClient.execute(this.currentSessionId, generatedCode);
+        const executionResult = await this.kernelClient.execute(
+          this.currentSessionId,
+          generatedCode,
+          validatedTimeout
+        );
 
         return {
           code: generatedCode,

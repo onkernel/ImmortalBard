@@ -8,6 +8,7 @@ import { SYSTEM_PROMPT, DEFAULT_MODELS } from './config';
 export class CodeGenerator {
   private provider: AIProvider | null = null;
   private model: any = null;
+  private modelName: string | null = null;
   private conversationHistory: ChatMessage[] = [];
   private apiKeys: Record<string, string | undefined>;
 
@@ -25,26 +26,26 @@ export class CodeGenerator {
 
   setProvider(provider: AIProvider, customModel?: string): void {
     this.provider = provider;
-    const modelName = customModel || DEFAULT_MODELS[provider];
+    this.modelName = customModel || DEFAULT_MODELS[provider];
 
     switch (provider) {
       case 'openai':
         if (!this.apiKeys.openai) {
           throw new Error('OpenAI API key not found. Set OPENAI_API_KEY or pass it to constructor.');
         }
-        this.model = openai(modelName);
+        this.model = openai(this.modelName);
         break;
       case 'anthropic':
         if (!this.apiKeys.anthropic) {
           throw new Error('Anthropic API key not found. Set ANTHROPIC_API_KEY or pass it to constructor.');
         }
-        this.model = anthropic(modelName);
+        this.model = anthropic(this.modelName);
         break;
       case 'google':
         if (!this.apiKeys.google) {
           throw new Error('Google API key not found. Set GOOGLE_API_KEY or pass it to constructor.');
         }
-        this.model = google(modelName);
+        this.model = google(this.modelName);
         break;
       default:
         throw new Error(`Unknown provider: ${provider}`);
@@ -55,15 +56,20 @@ export class CodeGenerator {
     ];
   }
 
-  async generatePlaywrightCode(instruction: string, aiSnapshotContext?: string): Promise<string> {
+  async generatePlaywrightCode(instruction: string, aiSnapshotContext?: string, timeoutSec?: number): Promise<string> {
     if (!this.provider || !this.model) {
       throw new Error('Provider not set. Call setProvider() first.');
     }
 
-    // Build user message with optional AI snapshot context
+    // Build user message with optional AI snapshot context and timeout info
     let userMessage = instruction;
+
+    if (timeoutSec !== undefined) {
+      userMessage = `${instruction}\n\n[Available execution time: ${timeoutSec} seconds]`;
+    }
+
     if (aiSnapshotContext) {
-      userMessage = `${instruction}\n\n<current_page_ai_snapshot>\n${aiSnapshotContext}\n</current_page_ai_snapshot>`;
+      userMessage = `${userMessage}\n\n<current_page_ai_snapshot>\n${aiSnapshotContext}\n</current_page_ai_snapshot>`;
     }
 
     this.conversationHistory.push({
@@ -72,12 +78,24 @@ export class CodeGenerator {
     });
 
     try {
-      const result = await generateText({
+      // Check if model supports temperature parameter
+      // o1 and GPT-5 models only support temperature=1 (default)
+      const supportsCustomTemperature = !this.isReasoningModel();
+
+      const generateConfig: any = {
         model: this.model,
         messages: this.conversationHistory,
-        temperature: 0.2,
-        maxTokens: 2000,
-      });
+        maxOutputTokens: 2000,
+      };
+
+      // Only add temperature if the model supports custom values
+      if (supportsCustomTemperature) {
+        generateConfig.temperature = 0.2;
+      } else {
+        generateConfig.temperature = 1;
+      }
+
+      const result = await generateText(generateConfig);
 
       const cleanedCode = this.cleanCode(result.text);
 
@@ -90,6 +108,19 @@ export class CodeGenerator {
     } catch (error) {
       throw new Error(`Code generation error: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  private isReasoningModel(): boolean {
+    if (!this.modelName) {
+      return false;
+    }
+
+    const modelNameLower = this.modelName.toLowerCase();
+
+    // OpenAI o1 and GPT-5 models don't support custom temperature
+    return modelNameLower.includes('o1') ||
+           modelNameLower.includes('gpt-5') ||
+           modelNameLower.includes('gpt5');
   }
 
   private cleanCode(text: string): string {
