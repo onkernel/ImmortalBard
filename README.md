@@ -109,6 +109,8 @@ You'll need:
    - [Anthropic](https://console.anthropic.com/)
    - [Google AI](https://makersuite.google.com/)
 
+**Recommended:** Anthropic's `claude-sonnet-4-5` currently delivers the best results for browser automation code generation.
+
 ### Environment Variables (The Prologue)
 
 Drop these in a `.env` file:
