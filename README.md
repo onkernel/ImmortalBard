@@ -6,7 +6,38 @@
 
 Command browsers as the Bard commanded language itself. No more wrestling with selectors or debugging brittle scripts. Set the scene, beseech your intent, and let The Immortal Bard transform your natural language into eloquent Playwright code for execution.
 
-Powered by [AI SDK](https://ai-sdk.dev/), [Kernel's](https://www.onkernel.com/docs/introduction) cloud browser infra with [Playwright Execution API](https://www.onkernel.com/docs/browsers/playwright-execution), and the timeless spirit of Shakespeare.
+Powered by [AI SDK](https://ai-sdk.dev/) and [Kernel's](https://www.onkernel.com/docs/introduction) cloud browser infra + [Playwright Execution API](https://www.onkernel.com/docs/browsers/playwright-execution), and the timeless spirit of The Immortal Bard.
+
+## 🎪 The Stage: Kernel's Playwright Execution API
+
+This SDK was created to demonstrate the remarkable potential of [Kernel's Playwright Execution API](https://www.onkernel.com/docs/browsers/playwright-execution)—and what is possible when you make it more agentic with the AI SDK.
+
+### What Makes It Different
+
+With Kernel's Playwright Execution API, your playwright code runs directly in the browser's VM.
+
+**The advantages:**
+- **⚡ Zero CDP Overhead** - No network roundtrips between your code and the browser
+- **🚀 Direct VM Execution** - Code executes in the same process as the browser itself
+- **🎯 Full Playwright Access** - Complete access to `page`, `context`, and `browser` objects
+- **🔒 Isolated & Fresh** - Each execution gets a clean context for safety and reliability
+- **⏱️ Configurable Timeouts** - Up to 300 seconds for complex operations
+
+### Making It Agentic
+
+ImmortalBard layers [Vercel's AI SDK](https://ai-sdk.dev/) on top of Kernel's execution infrastructure to create an agentic playwright automation experience:
+
+**Natural Language** → **AI Code Generation** → **Direct VM Execution** → **Results**
+
+Instead of writing brittle Playwright scripts, you describe what you want in plain English. The AI:
+1. Analyzes the current page state (via ARIA accessibility snapshots)
+2. Generates context-aware Playwright code
+3. Executes it directly in Kernel's browser VM
+4. Returns structured results
+
+**The result:** Browser automation that feels like having a conversation. No selectors to maintain, no scripts to update when UIs change, no CDP latency to slow you down.
+
+**This repository is a proof-of-concept** showing how powerful the Playwright Execution API can be.
 
 ## Features Most Excellent
 
