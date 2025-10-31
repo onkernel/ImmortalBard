@@ -1,9 +1,8 @@
 # 🎭 IMMORTAL BARD
 
-<img width="540" alt="image" src="https://github.com/user-attachments/assets/28a43077-244f-41bc-bea5-00ca8714e2d1" />
-
-
 > *"All the world's a stage, and all the browsers merely players."*
+
+<img width="540" alt="image" src="https://github.com/user-attachments/assets/28a43077-244f-41bc-bea5-00ca8714e2d1" />
 
 Command browsers as the Bard commanded language itself. No more wrestling with selectors or debugging brittle scripts. Set the scene, beseech your intent, and let The Immortal Bard transform your natural language into eloquent Playwright code for execution.
 
