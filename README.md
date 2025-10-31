@@ -10,7 +10,7 @@ Powered by [AI SDK](https://ai-sdk.dev/) and [Kernel's](https://www.onkernel.com
 
 ## 🎪 The Stage: Kernel's Playwright Execution API
 
-This SDK was created to demonstrate the remarkable potential of [Kernel's Playwright Execution API](https://www.onkernel.com/docs/browsers/playwright-execution)—and what is possible when you make it more agentic with the AI SDK.
+This SDK was created to demonstrate the potential of [Kernel's Playwright Execution API](https://www.onkernel.com/docs/browsers/playwright-execution)—and what is possible when you make it more agentic with the AI SDK.
 
 ### What Makes It Different
 
