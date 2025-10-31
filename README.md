@@ -1,5 +1,8 @@
 # 🎭 IMMORTAL BARD
 
+<img width="540" alt="image" src="https://github.com/user-attachments/assets/28a43077-244f-41bc-bea5-00ca8714e2d1" />
+
+
 **Natural language browser automation worthy of the Globe Theatre.**
 
 > *"All the world's a stage, and all the browsers merely players."*
